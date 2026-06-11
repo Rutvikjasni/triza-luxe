@@ -5,12 +5,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Save, Loader2 } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, CheckCircle2, XCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function AddProductPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState<{show: boolean, message: string, type: 'success' | 'error'}>({ show: false, message: '', type: 'success' })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [formData, setFormData] = useState({
     name: '',
@@ -39,6 +41,13 @@ export default function AddProductPage() {
       name,
       slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
     }))
+  }
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ show: true, message, type })
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }))
+    }, 3000)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,19 +98,39 @@ export default function AddProductPage() {
         throw error
       }
 
-      alert('Product saved successfully!')
-      router.push('/admin')
-      router.refresh()
+      showToast('Product saved successfully!', 'success')
+      setTimeout(() => {
+        router.push('/admin')
+        router.refresh()
+      }, 1500)
     } catch (error: any) {
       console.error('Save product error:', error)
-      alert(error.message || 'Failed to save product')
+      showToast(error.message || 'Failed to save product', 'error')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto px-6 py-12 relative">
+      <AnimatePresence>
+        {toast.show && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className={`fixed top-10 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-xl backdrop-blur-md border shadow-2xl ${
+              toast.type === 'success' 
+                ? 'bg-green-500/10 border-green-500/30 text-green-400' 
+                : 'bg-red-500/10 border-red-500/30 text-red-400'
+            }`}
+          >
+            {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+            <span className="font-medium tracking-wide">{toast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex items-center mb-8">
         <Link href="/admin">
           <Button variant="ghost" className="text-gold hover:bg-white/5 mr-4 px-2">
