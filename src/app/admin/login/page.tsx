@@ -18,11 +18,6 @@ export default function AdminLogin() {
     setLoading(true)
     setError(null)
 
-    // Hardcoded bypass for demo purposes
-    if (email === 'admin@trizaluxe.com' && password === 'admin123') {
-      router.push('/admin')
-      return
-    }
 
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({
@@ -31,7 +26,7 @@ export default function AdminLogin() {
     })
 
     if (error) {
-      setError("Invalid login credentials (Demo use: admin@trizaluxe.com / admin123)")
+      setError("Invalid login credentials")
       setLoading(false)
     } else {
       router.push('/admin')
