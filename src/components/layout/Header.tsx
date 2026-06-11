@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ShoppingBag, Search, User } from 'lucide-react'
+import { Menu, X, ShoppingBag, Search, User, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/store/CartContext'
+import { createClient } from '@/lib/supabase/client'
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -25,6 +26,8 @@ export function Header() {
   const pathname = usePathname()
   const { totalItems, setIsCartOpen } = useCart()
 
+  const [user, setUser] = useState<any>(null)
+
   if (pathname.startsWith('/admin')) return null
 
   useEffect(() => {
@@ -32,8 +35,27 @@ export function Header() {
       setIsScrolled(window.scrollY > 50)
     }
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+
+    // Check user session
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      subscription.unsubscribe()
+    }
   }, [])
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+  }
 
   return (
     <header
@@ -90,9 +112,21 @@ export function Header() {
           <button className="text-white/80 hover:text-gold transition-colors">
             <Search size={20} />
           </button>
-          <Link href="/auth/login" className="text-white/80 hover:text-gold transition-colors">
-            <User size={20} />
-          </Link>
+          
+          {user ? (
+            <div className="flex items-center gap-4">
+              <Link href="/admin" className="text-[10px] uppercase tracking-widest text-gold hover:text-white transition-colors border border-gold/30 px-3 py-1 rounded-full">
+                Admin
+              </Link>
+              <button onClick={handleLogout} className="text-white/80 hover:text-red-400 transition-colors" title="Logout">
+                <LogOut size={20} />
+              </button>
+            </div>
+          ) : (
+            <Link href="/auth/login" className="text-white/80 hover:text-gold transition-colors" title="Sign In">
+              <User size={20} />
+            </Link>
+          )}
           <button 
             onClick={() => setIsCartOpen(true)}
             className="text-white/80 hover:text-gold transition-colors relative"
