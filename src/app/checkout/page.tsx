@@ -14,6 +14,7 @@ export default function CheckoutPage() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [completedOrder, setCompletedOrder] = useState<any>(null)
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -71,6 +72,12 @@ export default function CheckoutPage() {
           const verifyData = await verifyRes.json()
 
           if (verifyRes.ok && verifyData.success) {
+            setCompletedOrder({
+              id: data.supabaseOrderId,
+              items: [...items],
+              total: totalPrice,
+              address: formData
+            })
             setIsSuccess(true)
             clearCart()
           } else {
@@ -104,6 +111,12 @@ export default function CheckoutPage() {
           const verifyData = await verifyRes.json()
 
           if (verifyRes.ok && verifyData.success) {
+            setCompletedOrder({
+              id: data.supabaseOrderId,
+              items: [...items],
+              total: totalPrice,
+              address: formData
+            })
             setIsSuccess(true)
             clearCart()
           } else {
@@ -134,17 +147,71 @@ export default function CheckoutPage() {
 
   if (!mounted) return null
 
-  if (isSuccess) {
+  if (isSuccess && completedOrder) {
     return (
-      <div className="min-h-screen pt-32 pb-24 px-6 flex flex-col items-center justify-center text-center">
-        <CheckCircle2 className="w-24 h-24 text-green-500 mb-6" />
-        <h1 className="text-4xl font-serif text-white mb-4">Payment Successful!</h1>
-        <p className="text-white/60 mb-8 max-w-md">
-          Thank you for your purchase. Your order has been placed successfully and will be shipped soon.
-        </p>
-        <Button onClick={() => router.push('/collections')} className="bg-gold text-black hover:bg-gold/90 font-bold tracking-widest px-8 py-6 rounded-none">
-          CONTINUE SHOPPING
-        </Button>
+      <div className="min-h-screen pt-32 pb-24 px-6 flex flex-col items-center justify-center relative">
+        {/* Background Effects */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-[500px] bg-gold/10 blur-[120px] rounded-full pointer-events-none"></div>
+
+        <div className="w-full max-w-2xl bg-[#0a0a0a] border border-gold/20 rounded-2xl shadow-2xl overflow-hidden relative z-10">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-gold/20 via-gold/10 to-transparent p-8 text-center border-b border-gold/10">
+            <CheckCircle2 className="w-20 h-20 text-gold mx-auto mb-4" />
+            <h1 className="text-3xl font-serif text-white mb-2 uppercase tracking-widest">Order Confirmed</h1>
+            <p className="text-white/70">Thank you for shopping with Triza Luxe.</p>
+          </div>
+
+          {/* Order Details Body */}
+          <div className="p-8 space-y-8">
+            <div className="flex flex-col md:flex-row justify-between gap-6 border-b border-white/10 pb-8">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-white/40 mb-1">Order Number</p>
+                <p className="text-white font-mono text-lg">#{completedOrder.id.split('-')[0]}</p>
+              </div>
+              <div className="md:text-right">
+                <p className="text-xs uppercase tracking-widest text-white/40 mb-1">Amount Paid</p>
+                <p className="text-gold font-serif text-xl">₹{completedOrder.total.toLocaleString('en-IN')}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 border-b border-white/10 pb-8">
+              <h3 className="text-sm uppercase tracking-widest text-gold/70 mb-4">Items Ordered</h3>
+              {completedOrder.items.map((item: any) => (
+                <div key={item.id} className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 relative rounded overflow-hidden bg-white/5">
+                      <Image src={item.image} alt={item.title} fill className="object-cover" />
+                    </div>
+                    <div>
+                      <p className="text-white/90 text-sm line-clamp-1">{item.title}</p>
+                      <p className="text-white/40 text-xs">Qty: {item.quantity}</p>
+                    </div>
+                  </div>
+                  <p className="text-white/90 font-serif">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <h3 className="text-sm uppercase tracking-widest text-gold/70 mb-4">Delivery Details</h3>
+              <div className="bg-white/5 p-4 rounded-lg border border-white/5">
+                <p className="text-white/90 font-medium">{completedOrder.address.name}</p>
+                <p className="text-white/60 text-sm mt-1">{completedOrder.address.phone}</p>
+                <p className="text-white/60 text-sm mt-2 leading-relaxed">
+                  {completedOrder.address.address}<br />
+                  {completedOrder.address.city}, {completedOrder.address.state} - {completedOrder.address.zip}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Action */}
+          <div className="p-8 bg-black/50 border-t border-white/5 text-center">
+            <Button onClick={() => router.push('/collections')} className="bg-gold text-black hover:bg-white font-bold tracking-widest px-10 py-6 rounded-none transition-colors">
+              CONTINUE SHOPPING
+            </Button>
+          </div>
+        </div>
       </div>
     )
   }
