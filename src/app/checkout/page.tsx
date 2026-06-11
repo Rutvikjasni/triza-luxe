@@ -158,23 +158,62 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
           {/* Form Section */}
           <div>
-            <h2 className="text-xl font-medium text-white mb-6 uppercase tracking-wider">Shipping Details</h2>
-            <form id="checkout-form" onSubmit={handlePayment} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input required type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white outline-none focus:border-gold transition-colors" />
-                <input required type="tel" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white outline-none focus:border-gold transition-colors" />
-              </div>
-              <input required type="text" name="address" placeholder="Complete Address" value={formData.address} onChange={handleChange} className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white outline-none focus:border-gold transition-colors" />
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <input required type="text" name="city" placeholder="City" value={formData.city} onChange={handleChange} className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white outline-none focus:border-gold transition-colors" />
-                <input required type="text" name="state" placeholder="State" value={formData.state} onChange={handleChange} className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white outline-none focus:border-gold transition-colors" />
-                <input required type="text" name="zip" placeholder="PIN Code" value={formData.zip} onChange={handleChange} className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white outline-none focus:border-gold transition-colors col-span-2 md:col-span-1" />
-              </div>
-            </form>
+            <div className="bg-[#0a0a0a] border border-white/10 p-8 rounded-xl shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
+              
+              <h2 className="text-xl font-serif text-white mb-8 uppercase tracking-widest flex items-center gap-3">
+                <span className="w-8 h-[1px] bg-gold"></span>
+                Shipping Details
+              </h2>
+              
+              <form id="checkout-form" onSubmit={handlePayment} className="space-y-6 relative z-10">
+                {/* Contact Section */}
+                <div className="space-y-4">
+                  <h3 className="text-xs uppercase tracking-widest text-gold/70 mb-2">Contact Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase tracking-widest text-white/50 pl-1">Full Name</label>
+                      <input required type="text" name="name" placeholder="John Doe" value={formData.name} onChange={handleChange} className="w-full bg-white/5 border-b border-white/10 px-4 py-3 text-white outline-none focus:bg-white/10 focus:border-gold transition-all duration-300 placeholder:text-white/20" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase tracking-widest text-white/50 pl-1">Phone Number</label>
+                      <input required type="tel" name="phone" placeholder="+91 98765 43210" value={formData.phone} onChange={handleChange} className="w-full bg-white/5 border-b border-white/10 px-4 py-3 text-white outline-none focus:bg-white/10 focus:border-gold transition-all duration-300 placeholder:text-white/20" />
+                    </div>
+                  </div>
+                </div>
 
-            <div className="mt-10 p-4 bg-white/5 border border-white/10 rounded-lg flex items-center gap-4 text-white/60 text-sm">
-              <ShieldCheck className="w-8 h-8 text-gold flex-shrink-0" />
-              <p>Your payment is processed securely by Razorpay. We do not store any card details on our servers.</p>
+                {/* Address Section */}
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-xs uppercase tracking-widest text-gold/70 mb-2">Delivery Address</h3>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-widest text-white/50 pl-1">Complete Address</label>
+                    <input required type="text" name="address" placeholder="House/Flat No., Street, Landmark" value={formData.address} onChange={handleChange} className="w-full bg-white/5 border-b border-white/10 px-4 py-3 text-white outline-none focus:bg-white/10 focus:border-gold transition-all duration-300 placeholder:text-white/20" />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-5 pt-2">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase tracking-widest text-white/50 pl-1">City</label>
+                      <input required type="text" name="city" placeholder="Mumbai" value={formData.city} onChange={handleChange} className="w-full bg-white/5 border-b border-white/10 px-4 py-3 text-white outline-none focus:bg-white/10 focus:border-gold transition-all duration-300 placeholder:text-white/20" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase tracking-widest text-white/50 pl-1">State</label>
+                      <input required type="text" name="state" placeholder="Maharashtra" value={formData.state} onChange={handleChange} className="w-full bg-white/5 border-b border-white/10 px-4 py-3 text-white outline-none focus:bg-white/10 focus:border-gold transition-all duration-300 placeholder:text-white/20" />
+                    </div>
+                    <div className="space-y-1.5 col-span-2 md:col-span-1">
+                      <label className="text-[10px] uppercase tracking-widest text-white/50 pl-1">PIN Code</label>
+                      <input required type="text" name="zip" placeholder="400001" value={formData.zip} onChange={handleChange} className="w-full bg-white/5 border-b border-white/10 px-4 py-3 text-white outline-none focus:bg-white/10 focus:border-gold transition-all duration-300 placeholder:text-white/20" />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div className="mt-8 p-5 bg-gradient-to-r from-gold/10 to-transparent border-l-2 border-gold flex items-center gap-5 text-white/70 text-sm">
+              <ShieldCheck className="w-10 h-10 text-gold flex-shrink-0" />
+              <div>
+                <h4 className="text-white font-medium mb-1">Secure Checkout</h4>
+                <p className="text-xs">Your payment is encrypted and processed securely by Razorpay. We do not store any card details.</p>
+              </div>
             </div>
           </div>
 
