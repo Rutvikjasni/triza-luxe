@@ -38,12 +38,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
     
-    // Optional: Only allow specific email to access admin
-    // if (user.email !== 'admin@trizaluxe.com') {
-    //   const url = request.nextUrl.clone()
-    //   url.pathname = '/'
-    //   return NextResponse.redirect(url)
-    // }
+    // Only allow specific email to access admin
+    if (user.email !== 'admin@trizaluxe.com') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
   }
 
   // Protect Profile Route
