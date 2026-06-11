@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/client'
 export default function AddProductPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -46,6 +47,28 @@ export default function AddProductPage() {
 
     try {
       const supabase = createClient()
+      
+      let imageUrl = '/placeholder-jewelry.jpg'
+
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('products')
+          .upload(fileName, imageFile)
+
+        if (uploadError) {
+          throw new Error('Image upload failed: ' + uploadError.message)
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('products')
+          .getPublicUrl(fileName)
+          
+        imageUrl = publicUrl
+      }
+
       const { error } = await supabase
         .from('products')
         .insert({
@@ -54,7 +77,7 @@ export default function AddProductPage() {
           category_id: formData.category_id,
           price: parseFloat(formData.price),
           description: formData.description,
-          image: formData.image || '/placeholder-jewelry.jpg',
+          image: imageUrl,
           gallery_images: [],
           featured: formData.featured,
           trending: formData.trending,
@@ -158,15 +181,18 @@ export default function AddProductPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-widest text-white/70">Image URL</label>
+            <label className="text-xs uppercase tracking-widest text-white/70">Product Image (Upload)</label>
             <Input 
-              name="image" 
-              value={formData.image} 
-              onChange={handleChange} 
-              className="bg-black border-white/20 focus-visible:ring-gold rounded-none h-12 text-white" 
-              placeholder="e.g. /products/necklace-1.png" 
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setImageFile(e.target.files[0])
+                }
+              }}
+              className="bg-black border-white/20 focus-visible:ring-gold rounded-none h-12 text-white/70 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-semibold file:bg-gold file:text-black hover:file:bg-gold/90 cursor-pointer pt-2" 
             />
-            <p className="text-[10px] text-white/40">Leave empty to use a placeholder image.</p>
+            <p className="text-[10px] text-white/40">Select an image to upload. Make sure you have created a public 'products' bucket in Supabase Storage.</p>
           </div>
 
           <div className="flex gap-6 py-4 border-y border-white/10">
