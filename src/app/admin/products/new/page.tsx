@@ -56,7 +56,6 @@ export default function AddProductPage() {
           description: formData.description,
           image: formData.image || '/placeholder-jewelry.jpg',
           gallery_images: [],
-          meesho_url: '',
           featured: formData.featured,
           trending: formData.trending,
           best_seller: formData.best_seller,

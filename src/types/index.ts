@@ -16,7 +16,6 @@ export type Product = {
   price: number
   image: string
   gallery_images: string[]
-  meesho_url: string
   featured: boolean
   trending: boolean
   best_seller: boolean

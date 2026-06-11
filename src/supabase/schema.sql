@@ -19,7 +19,6 @@ CREATE TABLE products (
   price DECIMAL(10, 2) NOT NULL,
   image TEXT NOT NULL,
   gallery_images TEXT[] DEFAULT '{}',
-  meesho_url TEXT NOT NULL,
   featured BOOLEAN DEFAULT FALSE,
   trending BOOLEAN DEFAULT FALSE,
   best_seller BOOLEAN DEFAULT FALSE,
