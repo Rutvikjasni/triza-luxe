@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,16 @@ export default function AddProductPage() {
     trending: false,
     best_seller: false
   })
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([])
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const supabase = createClient()
+      const { data } = await supabase.from('categories').select('id, name')
+      if (data) setCategories(data)
+    }
+    fetchCategories()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement
@@ -177,9 +187,9 @@ export default function AddProductPage() {
                 className="w-full bg-black border border-white/20 focus:ring-gold rounded-none h-12 px-3 text-sm text-white/90"
               >
                 <option value="">Select Category</option>
-                <option value="cat-necklaces">Necklaces</option>
-                <option value="cat-earrings">Earrings</option>
-                <option value="cat-mangal">Mangalsutra</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
               </select>
             </div>
 
