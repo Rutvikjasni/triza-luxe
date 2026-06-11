@@ -56,7 +56,8 @@ export async function POST(req: Request) {
     let rzpOrder: any = { id: `demo_order_${orderData.id.substring(0, 8)}`, amount: amount * 100, currency: 'INR' };
     
     try {
-      if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_ID !== 'rzp_test_fallback') {
+      const activeKeyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+      if (activeKeyId && activeKeyId !== 'rzp_test_fallback') {
         rzpOrder = await razorpay.orders.create({
           amount: Math.round(amount * 100), // Amount in paise
           currency: 'INR',
