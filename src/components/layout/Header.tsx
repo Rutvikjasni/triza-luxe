@@ -17,6 +17,7 @@ const navLinks = [
   { name: 'Necklaces', href: '/category/necklaces' },
   { name: 'Earrings', href: '/category/earrings' },
   { name: 'About', href: '/about' },
+  { name: 'FAQ', href: '/faq' },
   { name: 'Contact', href: '/contact' },
 ]
 
