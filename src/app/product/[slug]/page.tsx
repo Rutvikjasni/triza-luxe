@@ -58,7 +58,7 @@ export default async function ProductDetailsPage({ params }: ProductPageProps) {
           {/* Gallery - If there were more images */}
           {product.gallery_images && product.gallery_images.length > 0 && (
             <div className="grid grid-cols-4 gap-4">
-              {product.gallery_images.map((img, idx) => (
+              {product.gallery_images.map((img: string, idx: number) => (
                 <div key={idx} className="relative aspect-square bg-white/5 border border-gold/10 cursor-pointer hover:border-gold transition-colors">
                   <Image src={img} alt={`${product.name} gallery ${idx + 1}`} fill className="object-cover" />
                 </div>
