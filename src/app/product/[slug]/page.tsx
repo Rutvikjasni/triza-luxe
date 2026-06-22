@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ExternalLink, ShieldCheck, Truck, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { getFeaturedProducts } from '@/services/productService'
+import { createClient } from '@/lib/supabase/server'
 import { ProductImageMagnifier } from '@/components/product/ProductImageMagnifier'
 import { AddToCartButton } from '@/components/product/AddToCartButton'
 
@@ -15,8 +15,16 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const resolvedParams = await params
-  // In a real app, fetch the product by slug
-  const title = resolvedParams.slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  const supabase = await createClient()
+  
+  const { data: product } = await supabase
+    .from('products')
+    .select('name')
+    .eq('slug', resolvedParams.slug)
+    .single()
+
+  const title = product?.name || resolvedParams.slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  
   return {
     title: `${title} | Product Details`,
     description: `Buy ${title} from TRIZA LUXE. Premium imitation jewelry.`,
@@ -27,9 +35,14 @@ export default async function ProductDetailsPage({ params }: ProductPageProps) {
   const resolvedParams = await params
   const { slug } = resolvedParams
 
-  // Fetch product by slug. Using mock data for now.
-  const products = await getFeaturedProducts()
-  const product = products.find(p => p.slug === slug)
+  const supabase = await createClient()
+
+  // Fetch product from Supabase by slug
+  const { data: product } = await supabase
+    .from('products')
+    .select('*, category:categories(*)')
+    .eq('slug', slug)
+    .single()
 
   if (!product) {
     notFound()

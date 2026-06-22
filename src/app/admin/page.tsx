@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import { Package, FolderTree, Users, Mail, Plus, Edit, Trash2, ShoppingCart } from 'lucide-react'
+import { Package, FolderTree, Users, Mail, Plus, Edit, Trash2, ShoppingCart, Eye } from 'lucide-react'
+import { DeleteProductButton } from '@/components/admin/DeleteProductButton'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -14,12 +15,28 @@ export default async function AdminDashboard() {
   //   redirect('/admin/login')
   // }
 
-  // Dashboard Stats (Mocked for UI purposes)
+  const { data: products, error: productsError } = await supabase
+    .from('products')
+    .select('*, category:categories(name)')
+    .order('created_at', { ascending: false })
+
+  // Fetch dynamic counts for stats
+  const [
+    { count: categoriesCount },
+    { count: ordersCount },
+    { count: subscribersCount }
+  ] = await Promise.all([
+    supabase.from('categories').select('*', { count: 'exact', head: true }),
+    supabase.from('orders').select('*', { count: 'exact', head: true }),
+    supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true })
+  ])
+
+  // Dashboard Stats
   const stats = [
-    { name: 'Total Products', value: '124', icon: Package },
-    { name: 'Categories', value: '8', icon: FolderTree },
-    { name: 'Orders', value: '45', icon: ShoppingCart },
-    { name: 'Subscribers', value: '2.4k', icon: Mail },
+    { name: 'Total Products', value: products?.length?.toString() || '0', icon: Package },
+    { name: 'Categories', value: categoriesCount?.toString() || '0', icon: FolderTree },
+    { name: 'Orders', value: ordersCount?.toString() || '0', icon: ShoppingCart },
+    { name: 'Subscribers', value: subscribersCount?.toString() || '0', icon: Mail },
   ]
 
   return (
@@ -73,7 +90,7 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Recent Products Table Outline */}
+      {/* Recent Products Table */}
       <div className="bg-white/5 border border-gold/10 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-serif text-gold">Recent Products</h2>
@@ -91,17 +108,29 @@ export default async function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {/* Mock Row */}
-              <tr className="border-b border-white/5 hover:bg-white/5">
-                <td className="px-6 py-4 font-medium text-white">Royal Kundan Choker Set</td>
-                <td className="px-6 py-4">Necklaces</td>
-                <td className="px-6 py-4">₹4,999</td>
-                <td className="px-6 py-4 flex space-x-3">
-                  <button className="text-blue-400 hover:text-blue-300"><Edit size={18} /></button>
-                  <button className="text-red-400 hover:text-red-300"><Trash2 size={18} /></button>
-                </td>
-              </tr>
-              {/* Add more dynamic rows here based on Supabase fetch */}
+              {products?.map((product) => (
+                <tr key={product.id} className="border-b border-white/5 hover:bg-white/5">
+                  <td className="px-6 py-4 font-medium text-white">{product.name}</td>
+                  <td className="px-6 py-4">{product.category?.name || 'Uncategorized'}</td>
+                  <td className="px-6 py-4">₹{product.price?.toLocaleString('en-IN') || '0'}</td>
+                  <td className="px-6 py-4 flex space-x-4 items-center">
+                    <Link href={`/product/${product.slug}`} target="_blank" className="text-gray-400 hover:text-white transition-colors cursor-pointer" title="View Product">
+                      <Eye size={18} />
+                    </Link>
+                    <Link href={`/admin/products/${product.id}/edit`} className="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer" title="Edit Product">
+                      <Edit size={18} />
+                    </Link>
+                    <DeleteProductButton id={product.id} />
+                  </td>
+                </tr>
+              ))}
+              {(!products || products.length === 0) && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-white/50">
+                    No products found. Start by adding one.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
