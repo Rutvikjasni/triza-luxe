@@ -4,26 +4,38 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ShoppingBag, Search, User, LogOut } from 'lucide-react'
+import { Menu, X, ShoppingBag, Search, User, LogOut, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/store/CartContext'
 import { createClient } from '@/lib/supabase/client'
 
-const navLinks = [
+type NavLink = {
+  name: string;
+  href?: string;
+  dropdown?: { name: string; href: string }[];
+};
+
+const navLinks: NavLink[] = [
   { name: 'Home', href: '/' },
   { name: 'Collections', href: '/collections' },
   { name: 'Mangalsutra', href: '/category/mangalsutra' },
   { name: 'Necklaces', href: '/category/necklaces' },
-  { name: 'Earrings', href: '/category/earrings' },
-  { name: 'About', href: '/about' },
-  { name: 'FAQ', href: '/faq' },
-  { name: 'Contact', href: '/contact' },
+  { 
+    name: 'More', 
+    dropdown: [
+      { name: 'About', href: '/about' },
+      { name: 'FAQ', href: '/faq' },
+      { name: 'Contact', href: '/contact' },
+    ]
+  }
 ]
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false)
   const pathname = usePathname()
   const { totalItems, setIsCartOpen } = useCart()
 
@@ -37,6 +49,14 @@ export function Header() {
     }
     window.addEventListener('scroll', handleScroll)
 
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.dropdown-container')) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+
     // Check user session
     const supabase = createClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -49,6 +69,7 @@ export function Header() {
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
+      document.removeEventListener('click', handleClickOutside)
       subscription.unsubscribe()
     }
   }, [])
@@ -89,22 +110,67 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-10">
           {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                'text-sm uppercase tracking-widest transition-all duration-300 hover:text-gold relative group',
-                pathname === link.href ? 'text-gold' : 'text-white/80'
-              )}
-            >
-              {link.name}
-              <span
+            link.dropdown ? (
+              <div key={link.name} className="relative dropdown-container">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={cn(
+                    'text-sm uppercase tracking-widest transition-all duration-300 hover:text-gold flex items-center gap-1',
+                    isDropdownOpen ? 'text-gold' : 'text-white/80'
+                  )}
+                >
+                  {link.name}
+                  <ChevronDown
+                    size={14}
+                    className={cn(
+                      'transition-transform duration-300',
+                      isDropdownOpen ? 'rotate-180' : ''
+                    )}
+                  />
+                </button>
+                <AnimatePresence>
+                  {isDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full left-0 mt-4 w-48 bg-black/95 backdrop-blur-md border border-gold/20 flex flex-col py-2 z-50 shadow-xl"
+                    >
+                      {link.dropdown.map((dropLink) => (
+                        <Link
+                          key={dropLink.href}
+                          href={dropLink.href}
+                          onClick={() => setIsDropdownOpen(false)}
+                          className={cn(
+                            'px-4 py-3 text-xs uppercase tracking-widest hover:text-gold transition-colors hover:bg-white/5',
+                            pathname === dropLink.href ? 'text-gold bg-white/5' : 'text-white/80'
+                          )}
+                        >
+                          {dropLink.name}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                key={link.name}
+                href={link.href!}
                 className={cn(
-                  'absolute -bottom-1 left-0 w-0 h-[1px] bg-gold transition-all duration-300 group-hover:w-full',
-                  pathname === link.href ? 'w-full' : ''
+                  'text-sm uppercase tracking-widest transition-all duration-300 hover:text-gold relative group',
+                  pathname === link.href ? 'text-gold' : 'text-white/80'
                 )}
-              />
-            </Link>
+              >
+                {link.name}
+                <span
+                  className={cn(
+                    'absolute -bottom-1 left-0 w-0 h-[1px] bg-gold transition-all duration-300 group-hover:w-full',
+                    pathname === link.href ? 'w-full' : ''
+                  )}
+                />
+              </Link>
+            )
           ))}
         </nav>
 
@@ -172,24 +238,72 @@ export function Header() {
                 </button>
               </div>
 
-              <div className="flex flex-col space-y-8">
+              <div className="flex flex-col space-y-8 overflow-y-auto pb-6">
                 {navLinks.map((link, idx) => (
                   <motion.div
-                    key={link.href}
+                    key={link.name}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.1 }}
                   >
-                    <Link
-                      href={link.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={cn(
-                        'text-2xl font-serif tracking-widest hover:text-gold transition-colors',
-                        pathname === link.href ? 'text-gold' : 'text-white'
-                      )}
-                    >
-                      {link.name}
-                    </Link>
+                    {link.dropdown ? (
+                      <div className="flex flex-col">
+                        <button
+                          onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
+                          className={cn(
+                            'text-2xl font-serif tracking-widest transition-colors flex items-center justify-between w-full text-left',
+                            isMobileDropdownOpen ? 'text-gold' : 'text-white'
+                          )}
+                        >
+                          {link.name}
+                          <ChevronDown
+                            size={20}
+                            className={cn(
+                              'transition-transform duration-300',
+                              isMobileDropdownOpen ? 'rotate-180 text-gold' : 'text-white/50'
+                            )}
+                          />
+                        </button>
+                        <AnimatePresence>
+                          {isMobileDropdownOpen && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden flex flex-col space-y-4 pl-4 mt-4 border-l border-gold/20"
+                            >
+                              {link.dropdown.map(dropLink => (
+                                 <Link
+                                   key={dropLink.href}
+                                   href={dropLink.href}
+                                   onClick={() => {
+                                     setIsMobileMenuOpen(false);
+                                     setIsMobileDropdownOpen(false);
+                                   }}
+                                   className={cn(
+                                     'text-xl font-serif tracking-widest hover:text-gold transition-colors block py-2',
+                                     pathname === dropLink.href ? 'text-gold' : 'text-white/70'
+                                   )}
+                                 >
+                                   {dropLink.name}
+                                 </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <Link
+                        href={link.href!}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={cn(
+                          'text-2xl font-serif tracking-widest hover:text-gold transition-colors block',
+                          pathname === link.href ? 'text-gold' : 'text-white'
+                        )}
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
               </div>

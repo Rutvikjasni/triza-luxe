@@ -49,16 +49,16 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </div>
 
         {/* Action Buttons (appear on hover) */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out flex flex-col gap-2">
-          <Link href={`/product/${product.slug}`} className="w-full">
-            <Button variant="secondary" className="w-full bg-white/90 hover:bg-white text-black backdrop-blur-sm rounded-none">
+        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out flex flex-col gap-2 z-10">
+          <Link href={`/product/${product.slug}`} className="w-full cursor-pointer">
+            <Button variant="secondary" className="w-full bg-white/90 hover:bg-white text-black backdrop-blur-sm rounded-none cursor-pointer">
               <Eye className="w-4 h-4 mr-2" />
               VIEW DETAILS
             </Button>
           </Link>
           <AddToCartButton 
             product={product} 
-            className="w-full bg-gold hover:bg-gold/90 text-black rounded-none h-10 text-sm font-medium tracking-widest"
+            className="w-full bg-gold hover:bg-gold/90 text-black rounded-none h-10 text-sm font-medium tracking-widest cursor-pointer"
             showIcon={true}
           />
         </div>
