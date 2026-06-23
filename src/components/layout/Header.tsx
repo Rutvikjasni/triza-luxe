@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ShoppingBag, Search, User, LogOut, ChevronDown } from 'lucide-react'
+import { Menu, X, ShoppingBag, Search, User, LogOut, ChevronDown, Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/store/CartContext'
+import { useWishlist } from '@/store/WishlistContext'
 import { createClient } from '@/lib/supabase/client'
 
 type NavLink = {
@@ -38,6 +39,7 @@ export function Header() {
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false)
   const pathname = usePathname()
   const { totalItems, setIsCartOpen } = useCart()
+  const { totalItems: wishlistTotal } = useWishlist()
 
   const [user, setUser] = useState<any>(null)
 
@@ -77,6 +79,32 @@ export function Header() {
   const handleLogout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
+  }
+
+  const getInitials = () => {
+    if (!user) return ''
+    
+    const firstName = user.user_metadata?.first_name
+    const lastName = user.user_metadata?.last_name
+    
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+    }
+    
+    const fullName = user.user_metadata?.full_name
+    if (fullName) {
+      const parts = fullName.split(' ')
+      if (parts.length >= 2) {
+        return `${parts[0].charAt(0)}${parts[1].charAt(0)}`.toUpperCase()
+      }
+      return fullName.charAt(0).toUpperCase()
+    }
+    
+    if (user.email) {
+      return user.email.charAt(0).toUpperCase()
+    }
+    
+    return 'U'
   }
 
   return (
@@ -182,18 +210,37 @@ export function Header() {
           
           {user ? (
             <div className="flex items-center gap-4">
-              <Link href="/admin" className="text-[10px] uppercase tracking-widest text-gold hover:text-white transition-colors border border-gold/30 px-3 py-1 rounded-full">
-                Admin
-              </Link>
-              <button onClick={handleLogout} className="text-white/80 hover:text-red-400 transition-colors" title="Logout">
-                <LogOut size={20} />
-              </button>
+              {user.email === 'admin@trizaluxe.com' && (
+                <Link href="/admin" className="text-[10px] uppercase tracking-widest text-gold hover:text-white transition-colors border border-gold/30 px-3 py-1 rounded-full hidden md:block">
+                  Admin
+                </Link>
+              )}
+              <div className="flex items-center gap-3">
+                <Link 
+                  href="/profile" 
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-gold text-black font-bold text-xs hover:bg-white transition-colors shadow-[0_0_10px_rgba(212,175,55,0.3)]"
+                  title="Profile"
+                >
+                  {getInitials()}
+                </Link>
+                <button onClick={handleLogout} className="text-white/80 hover:text-red-400 transition-colors" title="Logout">
+                  <LogOut size={20} />
+                </button>
+              </div>
             </div>
           ) : (
             <Link href="/auth/login" className="text-white/80 hover:text-gold transition-colors" title="Sign In">
               <User size={20} />
             </Link>
           )}
+          <Link href="/wishlist" className="text-white/80 hover:text-gold transition-colors relative" title="Wishlist">
+            <Heart size={20} />
+            {wishlistTotal > 0 && (
+              <span className="absolute -top-1 -right-1 bg-gold text-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                {wishlistTotal}
+              </span>
+            )}
+          </Link>
           <button 
             onClick={() => setIsCartOpen(true)}
             className="text-white/80 hover:text-gold transition-colors relative"

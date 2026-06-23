@@ -6,11 +6,18 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function RegisterPage() {
-  const [name, setName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [middleName, setMiddleName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [mobile, setMobile] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>(false)
   const [loading, setLoading] = useState(false)
@@ -21,13 +28,29 @@ export default function RegisterPage() {
     setLoading(true)
     setError(null)
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      setLoading(false)
+      return
+    }
+
+    if (mobile.length < 10) {
+      setError("Please enter a valid mobile number")
+      setLoading(false)
+      return
+    }
+
     const supabase = createClient()
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name: name,
+          first_name: firstName,
+          middle_name: middleName,
+          last_name: lastName,
+          mobile_number: mobile,
+          full_name: `${firstName} ${lastName}`.trim(),
         }
       }
     })
@@ -68,19 +91,55 @@ export default function RegisterPage() {
               </div>
             )}
             
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-white/70">Full Name</label>
-              <Input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-white/70">First Name *</label>
+                <Input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-white/70">Middle Name</label>
+                <Input
+                  type="text"
+                  value={middleName}
+                  onChange={(e) => setMiddleName(e.target.value)}
+                  className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-white/70">Last Name *</label>
+                <Input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-white/70">Mobile Number *</label>
+                <Input
+                  type="tel"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                  required
+                  className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-white/70">Email Address</label>
+              <label className="text-xs uppercase tracking-widest text-white/70">Email Address *</label>
               <Input
                 type="email"
                 value={email}
@@ -90,16 +149,47 @@ export default function RegisterPage() {
               />
             </div>
             
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-white/70">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-white/70">Password *</label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-white/70">Confirm Password *</label>
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="bg-white/5 border-white/10 focus-visible:ring-gold focus-visible:border-gold rounded-none h-12 text-white transition-colors pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
             </div>
 
             <Button 

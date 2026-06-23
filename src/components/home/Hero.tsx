@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 
 export function Hero() {
   return (
@@ -63,13 +64,17 @@ export function Hero() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Button className="bg-gold hover:bg-gold/80 text-black font-bold tracking-widest px-8 py-6 rounded-none group w-full sm:w-auto">
-              EXPLORE COLLECTION
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 font-bold tracking-widest px-8 py-6 rounded-none w-full sm:w-auto">
-              VIEW NEW ARRIVALS
-            </Button>
+            <Link href="/collections" className="w-full sm:w-auto">
+              <Button className="bg-gold hover:bg-gold/80 text-black font-bold tracking-widest px-8 py-6 rounded-none group w-full">
+                EXPLORE COLLECTION
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link href="/collections" className="w-full sm:w-auto">
+              <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 font-bold tracking-widest px-8 py-6 rounded-none w-full">
+                VIEW NEW ARRIVALS
+              </Button>
+            </Link>
           </motion.div>
         </div>
       </div>

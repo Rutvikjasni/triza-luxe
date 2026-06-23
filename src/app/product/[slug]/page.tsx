@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
 import { ProductImageMagnifier } from '@/components/product/ProductImageMagnifier'
 import { AddToCartButton } from '@/components/product/AddToCartButton'
+import { AddToWishlistButton } from '@/components/product/AddToWishlistButton'
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>
@@ -87,10 +88,14 @@ export default async function ProductDetailsPage({ params }: ProductPageProps) {
             {product.description}
           </p>
 
-          <div className="mb-10 w-full">
+          <div className="mb-10 w-full flex flex-col sm:flex-row gap-4">
             <AddToCartButton 
               product={product} 
-              className="w-full h-16 bg-gold hover:bg-gold/90 text-black font-bold tracking-widest text-lg rounded-none transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+              className="w-full sm:flex-1 h-16 bg-gold hover:bg-gold/90 text-black font-bold tracking-widest text-lg rounded-none transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+            />
+            <AddToWishlistButton 
+              product={product}
+              className="w-full sm:w-auto h-16 px-8 border-gold/50 text-gold hover:bg-gold/10 font-bold tracking-widest rounded-none"
             />
           </div>
 

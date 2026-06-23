@@ -5,6 +5,8 @@ import { ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCart, CartItem } from '@/store/CartContext'
 import { Product } from '@/types'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 interface AddToCartButtonProps {
   product: Product
@@ -15,10 +17,20 @@ interface AddToCartButtonProps {
 
 export function AddToCartButton({ product, className, showIcon = true, text = "ADD TO CART" }: AddToCartButtonProps) {
   const { addToCart } = useCart()
+  const router = useRouter()
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+      router.push('/auth/login')
+      return
+    }
+
     const item: CartItem = {
       id: product.id,
       title: product.name,

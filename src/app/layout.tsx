@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { FloatingWhatsApp } from "@/components/common/FloatingWhatsApp";
 import { LiquidBackground } from "@/components/ui-custom/LiquidBackground";
 import { CartProvider } from "@/store/CartContext";
+import { WishlistProvider } from "@/store/WishlistContext";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 
 const inter = Inter({
@@ -56,16 +57,18 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} dark antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-black text-white selection:bg-gold selection:text-black">
-        <CartProvider>
-          <LiquidBackground />
-          <Header />
-          <CartDrawer />
-          <main className="flex-1 relative z-10">
-            {children}
-          </main>
-          <Footer />
-          <FloatingWhatsApp />
-        </CartProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <LiquidBackground />
+            <Header />
+            <CartDrawer />
+            <main className="flex-1 relative z-10">
+              {children}
+            </main>
+            <Footer />
+            <FloatingWhatsApp />
+          </CartProvider>
+        </WishlistProvider>
       </body>
     </html>
   );
