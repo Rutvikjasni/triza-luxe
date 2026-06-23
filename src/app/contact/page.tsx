@@ -36,8 +36,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="text-white font-bold tracking-widest uppercase text-sm mb-1">Our Boutique</h3>
                   <p className="text-white/60 font-light">
-                    Luxury Lane, Diamond District<br />
-                    Mumbai, Maharashtra 400001<br />
+                    Surat, Gujarat<br />
                     India
                   </p>
                 </div>
@@ -50,7 +49,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="text-white font-bold tracking-widest uppercase text-sm mb-1">Phone</h3>
                   <p className="text-white/60 font-light">
-                    +91 98765 43210<br />
+                    +91 87358 00946<br />
                     Mon-Fri: 10am - 7pm IST
                   </p>
                 </div>
