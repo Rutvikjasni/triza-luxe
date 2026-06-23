@@ -6,7 +6,7 @@ import { MessageCircle } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
 export function FloatingWhatsApp() {
-  const whatsappNumber = '919876543210' // Replace with actual number
+  const whatsappNumber = '918735800946' // Replace with actual number
   const message = 'Hello Triza Luxe, I would like to inquire about your jewelry collection.'
   const pathname = usePathname()
 

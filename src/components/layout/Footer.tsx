@@ -48,15 +48,15 @@ export function Footer() {
               Exquisite imitation jewelry crafted for the modern individual who seeks luxury without compromise. Excellence in every detail.
             </p>
             <div className="flex space-x-4 pt-4">
-              <a href="#" className="p-2 border border-gold/20 hover:border-gold hover:text-gold transition-all duration-300 rounded-full">
+              <a href="https://www.instagram.com/triza_luxe?igsh=ZW9ieTVremJwczZq&utm_source=qr" target="_blank" rel="noopener noreferrer" className="p-2 border border-gold/20 hover:border-gold hover:text-gold transition-all duration-300 rounded-full">
                 <InstagramIcon size={18} />
               </a>
-              <a href="#" className="p-2 border border-gold/20 hover:border-gold hover:text-gold transition-all duration-300 rounded-full">
+              <span className="p-2 border border-gold/20 opacity-30 cursor-not-allowed rounded-full" title="Coming soon">
                 <FacebookIcon size={18} />
-              </a>
-              <a href="#" className="p-2 border border-gold/20 hover:border-gold hover:text-gold transition-all duration-300 rounded-full">
+              </span>
+              <span className="p-2 border border-gold/20 opacity-30 cursor-not-allowed rounded-full" title="Coming soon">
                 <TwitterIcon size={18} />
-              </a>
+              </span>
             </div>
           </div>
 
@@ -66,8 +66,7 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-white/60">
               <li><Link href="/collections" className="hover:text-gold transition-colors">All Collections</Link></li>
               <li><Link href="/category/necklaces" className="hover:text-gold transition-colors">Necklaces</Link></li>
-              <li><Link href="/category/earrings" className="hover:text-gold transition-colors">Earrings</Link></li>
-              <li><Link href="/category/rings" className="hover:text-gold transition-colors">Rings</Link></li>
+              <li><Link href="/category/mangalsutra" className="hover:text-gold transition-colors">Mangalsutra</Link></li>
             </ul>
           </div>
 
@@ -88,11 +87,11 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-white/60">
               <li className="flex items-start space-x-3">
                 <MapPin size={18} className="text-gold mt-0.5 shrink-0" />
-                <span>Luxury Lane, Diamond District, Mumbai, India</span>
+                <span>Surat, Gujarat, India</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone size={18} className="text-gold shrink-0" />
-                <span>+91 98765 43210</span>
+                <span>+91 87358 00946</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail size={18} className="text-gold shrink-0" />
@@ -107,7 +106,7 @@ export function Footer() {
           <p>© {new Date().getFullYear()} TRIZA LUXE. ALL RIGHTS RESERVED.</p>
           <div className="flex space-x-6">
             <Link href="/terms" className="hover:text-gold">TERMS & CONDITIONS</Link>
-            <Link href="/privacy" className="hover:text-gold">PRIVACY POLICY</Link>
+            <Link href="/privacy-policy" className="hover:text-gold">PRIVACY POLICY</Link>
           </div>
         </div>
       </div>

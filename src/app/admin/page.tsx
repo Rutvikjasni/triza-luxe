@@ -87,6 +87,16 @@ export default async function AdminDashboard() {
           <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
             Manage Testimonials
           </Button>
+          <Link href="/admin/about-us">
+            <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
+              <Edit className="mr-2 w-4 h-4" /> Manage About Us
+            </Button>
+          </Link>
+          <Link href="/admin/privacy-policy">
+            <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
+              <Edit className="mr-2 w-4 h-4" /> Manage Privacy Policy
+            </Button>
+          </Link>
         </div>
       </div>
 
