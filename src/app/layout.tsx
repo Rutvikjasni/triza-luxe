@@ -4,7 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingWhatsApp } from "@/components/common/FloatingWhatsApp";
-import { LiquidBackground } from "@/components/ui-custom/LiquidBackground";
+
 import { CartProvider } from "@/store/CartContext";
 import { WishlistProvider } from "@/store/WishlistContext";
 import { CartDrawer } from "@/components/layout/CartDrawer";
@@ -59,7 +59,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-black text-white selection:bg-gold selection:text-black">
         <WishlistProvider>
           <CartProvider>
-            <LiquidBackground />
+
             <Header />
             <CartDrawer />
             <main className="flex-1 relative z-10">
