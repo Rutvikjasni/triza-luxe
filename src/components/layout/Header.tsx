@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ShoppingBag, Search, User, LogOut, ChevronDown, Heart } from 'lucide-react'
+import { Menu, X, ShoppingBag, Search, User, LogOut, ChevronDown, Heart, MoreVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/store/CartContext'
@@ -37,6 +37,8 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false)
+  const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false)
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const pathname = usePathname()
   const { totalItems, setIsCartOpen } = useCart()
   const { totalItems: wishlistTotal } = useWishlist()
@@ -116,7 +118,7 @@ export function Header() {
           : 'bg-transparent py-5'
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto flex items-center justify-between relative">
         {/* Mobile Menu Toggle */}
         <button
           className="lg:hidden text-white hover:text-gold transition-colors"
@@ -125,8 +127,39 @@ export function Header() {
           <Menu size={24} />
         </button>
 
+        {/* Mobile Search Input */}
+        <AnimatePresence>
+          {isMobileSearchOpen && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="absolute left-1/2 -translate-x-1/2 w-[60%] max-w-[250px] lg:hidden z-10"
+            >
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                autoFocus
+                className="w-full bg-black/90 border border-gold/50 rounded-full py-2 pl-4 pr-10 text-white text-sm outline-none shadow-lg focus:border-gold transition-colors backdrop-blur-md"
+              />
+              <button 
+                onClick={() => setIsMobileSearchOpen(false)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-gold"
+              >
+                <X size={16} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Logo */}
-        <Link href="/" className="flex flex-col items-center group">
+        <Link 
+          href="/" 
+          className={cn(
+            "flex flex-col items-center group transition-opacity duration-300",
+            isMobileSearchOpen ? "opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto" : "opacity-100"
+          )}
+        >
           <span className="text-2xl md:text-3xl font-serif tracking-[0.2em] text-white group-hover:text-gold transition-colors duration-300 uppercase">
             Triza Luxe
           </span>
@@ -202,8 +235,26 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Actions */}
-        <div className="flex items-center space-x-5">
+        {/* Mobile Right Actions Toggle */}
+        <div className="lg:hidden flex items-center gap-3">
+          {!isMobileSearchOpen && (
+            <button
+              className="text-white hover:text-gold transition-colors"
+              onClick={() => setIsMobileSearchOpen(true)}
+            >
+              <Search size={22} />
+            </button>
+          )}
+          <button
+            className="text-white hover:text-gold transition-colors"
+            onClick={() => setIsMobileActionMenuOpen(true)}
+          >
+            <MoreVertical size={24} />
+          </button>
+        </div>
+
+        {/* Actions (Desktop) */}
+        <div className="hidden lg:flex items-center space-x-5">
           <button className="text-white/80 hover:text-gold transition-colors">
             <Search size={20} />
           </button>
@@ -355,11 +406,102 @@ export function Header() {
                 ))}
               </div>
 
-              <div className="mt-auto">
-                <Button className="w-full bg-gold hover:bg-gold/80 text-black font-bold tracking-widest py-6">
+              {/* Removed Actions/Icons from here as they moved to the Right Menu */}
+
+              <div className="mt-auto pt-10 flex justify-center w-full pb-8">
+                <Button className="w-[80%] max-w-[250px] bg-gold hover:bg-gold/80 text-black font-bold tracking-widest py-6 rounded-md">
                   SHOP ALL
                 </Button>
               </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile Right Actions Dropdown */}
+      <AnimatePresence>
+        {isMobileActionMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileActionMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              className="fixed top-20 right-6 w-56 bg-black border border-gold/20 z-[70] py-2 flex flex-col shadow-[0_0_20px_rgba(212,175,55,0.15)] lg:hidden rounded-sm"
+            >
+              {user ? (
+                <>
+                  <Link 
+                    href="/profile" 
+                    onClick={() => setIsMobileActionMenuOpen(false)} 
+                    className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-gold hover:bg-white/5 transition-colors uppercase tracking-widest text-xs"
+                  >
+                    <User size={18} />
+                    Profile
+                  </Link>
+                  <button 
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileActionMenuOpen(false);
+                    }} 
+                    className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-red-400 hover:bg-white/5 transition-colors uppercase tracking-widest text-xs w-full text-left"
+                  >
+                    <LogOut size={18} />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link 
+                  href="/auth/login" 
+                  onClick={() => setIsMobileActionMenuOpen(false)} 
+                  className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-gold hover:bg-white/5 transition-colors uppercase tracking-widest text-xs"
+                >
+                  <User size={18} />
+                  Login
+                </Link>
+              )}
+              
+              <div className="h-[1px] bg-gold/20 my-1 w-full" />
+              
+              <Link 
+                href="/wishlist" 
+                onClick={() => setIsMobileActionMenuOpen(false)} 
+                className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-gold hover:bg-white/5 transition-colors uppercase tracking-widest text-xs"
+              >
+                <div className="relative">
+                  <Heart size={18} />
+                  {wishlistTotal > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-gold text-black text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
+                      {wishlistTotal}
+                    </span>
+                  )}
+                </div>
+                Favorite
+              </Link>
+              
+              <button 
+                onClick={() => {
+                  setIsMobileActionMenuOpen(false);
+                  setIsCartOpen(true);
+                }} 
+                className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-gold hover:bg-white/5 transition-colors uppercase tracking-widest text-xs w-full text-left"
+              >
+                <div className="relative">
+                  <ShoppingBag size={18} />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-gold text-black text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
+                      {totalItems}
+                    </span>
+                  )}
+                </div>
+                Cart
+              </button>
             </motion.div>
           </>
         )}
