@@ -1,6 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next'
-import { ProductCard } from '@/components/product/ProductCard'
+import { ProductGridWithFilter } from '@/components/product/ProductGridWithFilter'
 import { getFeaturedProducts, getBestSellers, getTrendingProducts } from '@/services/productService'
 
 export const metadata: Metadata = {
@@ -34,17 +34,7 @@ export default async function CollectionsPage() {
         </p>
       </div>
 
-      {products.length === 0 ? (
-        <div className="text-center text-white/50 py-20">
-          No products found in the collection.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
-          ))}
-        </div>
-      )}
+      <ProductGridWithFilter products={products} />
     </div>
   )
 }

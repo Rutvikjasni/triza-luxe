@@ -77,6 +77,8 @@ export function Footer() {
               <li><Link href="/about" className="hover:text-gold transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-gold transition-colors">Contact Us</Link></li>
               <li><Link href="/faq" className="hover:text-gold transition-colors">FAQ</Link></li>
+              <li><Link href="/shipping-policy" className="hover:text-gold transition-colors">Shipping Policy</Link></li>
+              <li><Link href="/return-policy" className="hover:text-gold transition-colors">Return Policy</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-gold transition-colors">Privacy Policy</Link></li>
             </ul>
           </div>
@@ -105,7 +107,7 @@ export function Footer() {
         <div className="pt-10 border-t border-gold/10 flex flex-col md:flex-row justify-between items-center text-xs text-white/40 tracking-widest gap-4">
           <p>© {new Date().getFullYear()} TRIZA LUXE. ALL RIGHTS RESERVED.</p>
           <div className="flex space-x-6">
-            <Link href="/terms" className="hover:text-gold">TERMS & CONDITIONS</Link>
+            <Link href="/terms-and-conditions" className="hover:text-gold">TERMS & CONDITIONS</Link>
             <Link href="/privacy-policy" className="hover:text-gold">PRIVACY POLICY</Link>
           </div>
         </div>

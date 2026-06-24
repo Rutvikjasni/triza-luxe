@@ -1,7 +1,6 @@
 import React from 'react'
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { ProductCard } from '@/components/product/ProductCard'
+import { ProductGridWithFilter } from '@/components/product/ProductGridWithFilter'
 import { getProductsByCategory } from '@/services/productService'
 
 interface CategoryPageProps {
@@ -37,17 +36,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         </p>
       </div>
 
-      {products.length === 0 ? (
-        <div className="text-center text-white/50 py-20">
-          No products found in this category.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
-          ))}
-        </div>
-      )}
+      <ProductGridWithFilter products={products} />
     </div>
   )
 }

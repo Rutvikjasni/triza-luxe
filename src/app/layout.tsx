@@ -54,9 +54,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${playfair.variable} dark antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-black text-white selection:bg-gold selection:text-black">
+      <body suppressHydrationWarning className="min-h-screen flex flex-col bg-black text-white selection:bg-gold selection:text-black">
         <WishlistProvider>
           <CartProvider>
 

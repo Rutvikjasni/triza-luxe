@@ -7,6 +7,36 @@ import Image from 'next/image'
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState('All')
+
+  // Extract unique payment methods
+  const paymentMethods = React.useMemo(() => {
+    const methods = new Set<string>()
+    orders.forEach(o => {
+      if (o.payment_method) methods.add(o.payment_method)
+    })
+    return ['All', ...Array.from(methods)]
+  }, [orders])
+
+  // Filter orders
+  const filteredOrders = React.useMemo(() => {
+    return orders.filter(order => {
+      // Search by Order ID or Product Name
+      const searchLower = searchTerm.toLowerCase()
+      const matchesSearch = 
+        order.id.toLowerCase().includes(searchLower) ||
+        order.order_items?.some((item: any) => 
+          item.product?.name?.toLowerCase().includes(searchLower)
+        )
+
+      const matchesStatus = statusFilter === 'All' || order.status === statusFilter
+      const matchesPayment = paymentTypeFilter === 'All' || order.payment_method === paymentTypeFilter
+
+      return matchesSearch && matchesStatus && matchesPayment
+    })
+  }, [orders, searchTerm, statusFilter, paymentTypeFilter])
 
   useEffect(() => {
     fetchOrders()
@@ -82,6 +112,49 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
+      {/* Filters Section */}
+      <div className="bg-[#111] border border-white/10 p-6 rounded-xl flex flex-col md:flex-row gap-6 mb-8">
+        <div className="flex-1">
+          <label className="block text-xs uppercase tracking-widest text-gold mb-2">Search</label>
+          <input
+            type="text"
+            placeholder="Search by Order ID or Product..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-black/50 border border-white/10 text-white px-4 py-2 rounded focus:outline-none focus:border-gold transition-colors"
+          />
+        </div>
+
+        <div className="w-full md:w-48">
+          <label className="block text-xs uppercase tracking-widest text-gold mb-2">Status</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full bg-black/50 border border-white/10 text-white px-4 py-2 rounded focus:outline-none focus:border-gold transition-colors appearance-none"
+          >
+            <option value="All">All Statuses</option>
+            <option value="PENDING">Pending</option>
+            <option value="PAID">Paid</option>
+            <option value="SHIPPED">Shipped</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+
+        <div className="w-full md:w-48">
+          <label className="block text-xs uppercase tracking-widest text-gold mb-2">Payment Type</label>
+          <select
+            value={paymentTypeFilter}
+            onChange={(e) => setPaymentTypeFilter(e.target.value)}
+            className="w-full bg-black/50 border border-white/10 text-white px-4 py-2 rounded focus:outline-none focus:border-gold transition-colors appearance-none"
+          >
+            {paymentMethods.map(method => (
+              <option key={method} value={method}>{method === 'All' ? 'All Types' : method}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="bg-[#111] border border-white/10 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -95,14 +168,14 @@ export default function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {orders.length === 0 ? (
+              {filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="p-8 text-center text-white/50">
-                    No orders found.
+                    No orders found matching your filters.
                   </td>
                 </tr>
               ) : (
-                orders.map((order) => (
+                filteredOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-white/5 transition-colors align-top">
                     <td className="p-4">
                       <div className="space-y-3">
