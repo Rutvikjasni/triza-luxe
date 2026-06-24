@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Order } from '@/types'
-import { Package, Search, ChevronDown, CheckCircle, Clock, XCircle, Truck } from 'lucide-react'
+import { Package, CheckCircle, Clock, XCircle, Truck } from 'lucide-react'
+import Image from 'next/image'
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function AdminOrdersPage() {
       
       // Update local state
       setOrders(orders.map(order => 
-        order.id === orderId ? { ...order, status: status as any } : order
+        order.id === orderId ? { ...order, status: status } : order
       ))
     } catch (error) {
       console.error('Error updating order:', error)
@@ -87,9 +87,9 @@ export default function AdminOrdersPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-black/50 border-b border-white/10">
-                <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase">Order ID / Date</th>
-                <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase">Customer</th>
-                <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase">Amount</th>
+                <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase">Products</th>
+                <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase">Qty</th>
+                <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase">Payment Type</th>
                 <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase">Status</th>
                 <th className="p-4 text-white/60 font-medium text-sm tracking-wider uppercase text-right">Actions</th>
               </tr>
@@ -103,20 +103,47 @@ export default function AdminOrdersPage() {
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-white/5 transition-colors">
+                  <tr key={order.id} className="hover:bg-white/5 transition-colors align-top">
                     <td className="p-4">
-                      <div className="text-white font-mono text-sm mb-1">{order.id.substring(0, 8).toUpperCase()}</div>
-                      <div className="text-white/50 text-xs">
-                        {new Date(order.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
+                      <div className="space-y-3">
+                        {order.order_items?.map((item: any, idx: number) => (
+                          <div key={idx} className="flex items-center space-x-3">
+                            <div className="w-10 h-10 relative bg-white/10 rounded overflow-hidden flex-shrink-0">
+                              {item.product?.images?.[0] ? (
+                                <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white/20 text-[10px]">No Img</div>
+                              )}
+                            </div>
+                            <div className="text-sm text-white line-clamp-2">
+                              {item.product?.name || 'Unknown Product'}
+                            </div>
+                          </div>
+                        ))}
+                        {(!order.order_items || order.order_items.length === 0) && (
+                          <div className="text-white/50 text-sm">No products found</div>
+                        )}
+                      </div>
+                      <div className="mt-3 text-xs text-white/40">
+                        Order #{order.id.substring(0, 8).toUpperCase()}
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="text-white text-sm mb-1">{order.shipping_name}</div>
-                      <div className="text-white/50 text-xs">{order.shipping_phone}</div>
+                      <div className="space-y-3">
+                        {order.order_items?.map((item: any, idx: number) => (
+                          <div key={idx} className="h-10 flex items-center text-white/80 text-sm">
+                            x{item.quantity}
+                          </div>
+                        ))}
+                      </div>
                     </td>
                     <td className="p-4">
-                      <div className="text-gold font-serif">₹{order.total_amount.toLocaleString('en-IN')}</div>
-                      <div className="text-white/40 text-[10px] uppercase mt-1">{order.payment_method}</div>
+                      <div className="flex flex-col">
+                        <span className="text-gold font-serif text-sm">₹{order.total_amount?.toLocaleString('en-IN') || 0}</span>
+                        <span className="text-white/50 text-xs uppercase mt-1 px-2 py-1 bg-white/5 rounded w-fit">
+                          {order.payment_method || 'N/A'}
+                        </span>
+                      </div>
                     </td>
                     <td className="p-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>

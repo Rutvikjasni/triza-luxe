@@ -43,8 +43,6 @@ export function Header() {
 
   const [user, setUser] = useState<any>(null)
 
-  if (pathname.startsWith('/admin')) return null
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
@@ -75,6 +73,8 @@ export function Header() {
       subscription.unsubscribe()
     }
   }, [])
+
+  if (pathname.startsWith('/admin')) return null
 
   const handleLogout = async () => {
     const supabase = createClient()

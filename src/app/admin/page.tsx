@@ -1,53 +1,39 @@
 import React from 'react'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
-import { Package, FolderTree, Users, Mail, Plus, Edit, Trash2, ShoppingCart, Eye } from 'lucide-react'
-import { DeleteProductButton } from '@/components/admin/DeleteProductButton'
+import { Package, FolderTree, Users, ShoppingCart } from 'lucide-react'
+import { DashboardChart } from '@/components/admin/DashboardChart'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
-  
-  // const { data: { session }, error } = await supabase.auth.getSession()
 
-  // if (error || !session) {
-  //   redirect('/admin/login')
-  // }
-
-  const { data: products, error: productsError } = await supabase
-    .from('products')
-    .select('*, category:categories(name)')
-    .order('created_at', { ascending: false })
-
-  // Fetch dynamic counts for stats
+  // Fetch dynamic counts and data
   const [
+    { count: productsCount },
     { count: categoriesCount },
-    { count: ordersCount },
-    { count: subscribersCount }
+    { data: ordersData },
+    { data: contactsData },
+    { data: reviewsData },
   ] = await Promise.all([
+    supabase.from('products').select('*', { count: 'exact', head: true }),
     supabase.from('categories').select('*', { count: 'exact', head: true }),
-    supabase.from('orders').select('*', { count: 'exact', head: true }),
-    supabase.from('newsletter_subscribers').select('*', { count: 'exact', head: true })
+    supabase.from('orders').select('id, created_at, total_amount'),
+    supabase.from('newsletter_subscribers').select('id, created_at'), // using subscribers as proxy for contacts if contact table isn't present
+    supabase.from('reviews').select('id, created_at') // Mock reviews if table doesn't exist
   ])
 
   // Dashboard Stats
   const stats = [
-    { name: 'Total Products', value: products?.length?.toString() || '0', icon: Package },
+    { name: 'Total Products', value: productsCount?.toString() || '0', icon: Package },
     { name: 'Categories', value: categoriesCount?.toString() || '0', icon: FolderTree },
-    { name: 'Orders', value: ordersCount?.toString() || '0', icon: ShoppingCart },
-    { name: 'Subscribers', value: subscribersCount?.toString() || '0', icon: Mail },
+    { name: 'Total Orders', value: ordersData?.length?.toString() || '0', icon: ShoppingCart },
+    { name: 'Total Revenue', value: `₹${ordersData?.reduce((sum, order) => sum + (order.total_amount || 0), 0).toLocaleString('en-IN') || '0'}`, icon: Users },
   ]
 
   return (
-    <div className="max-w-7xl mx-auto px-6">
+    <div className="max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-serif text-white">Dashboard</h1>
-        <form action="/auth/signout" method="post">
-          <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
-            Sign Out
-          </Button>
-        </form>
+        <h1 className="text-3xl font-serif text-white">Dashboard Overview</h1>
       </div>
 
       {/* Stats Grid */}
@@ -65,86 +51,12 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white/5 border border-gold/10 p-6 mb-12">
-        <h2 className="text-xl font-serif text-gold mb-6">Quick Actions</h2>
-        <div className="flex flex-wrap gap-4">
-          <Link href="/admin/products/new">
-            <Button className="bg-gold hover:bg-gold/90 text-black rounded-none">
-              <Plus className="mr-2 w-4 h-4" /> Add Product
-            </Button>
-          </Link>
-          <Link href="/admin/categories/new">
-            <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
-              <Plus className="mr-2 w-4 h-4" /> Add Category
-            </Button>
-          </Link>
-          <Link href="/admin/orders">
-            <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
-              <ShoppingCart className="mr-2 w-4 h-4" /> View Orders
-            </Button>
-          </Link>
-          <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
-            Manage Testimonials
-          </Button>
-          <Link href="/admin/about-us">
-            <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
-              <Edit className="mr-2 w-4 h-4" /> Manage About Us
-            </Button>
-          </Link>
-          <Link href="/admin/privacy-policy">
-            <Button variant="outline" className="border-gold/50 text-gold hover:bg-gold/10 rounded-none">
-              <Edit className="mr-2 w-4 h-4" /> Manage Privacy Policy
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Recent Products Table */}
-      <div className="bg-white/5 border border-gold/10 p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-serif text-gold">Recent Products</h2>
-          <Button variant="link" className="text-gold hover:text-white">View All</Button>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-white/70">
-            <thead className="bg-black/50 text-xs uppercase tracking-widest text-gold border-b border-gold/20">
-              <tr>
-                <th className="px-6 py-4">Product Name</th>
-                <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Price</th>
-                <th className="px-6 py-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products?.map((product) => (
-                <tr key={product.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="px-6 py-4 font-medium text-white">{product.name}</td>
-                  <td className="px-6 py-4">{product.category?.name || 'Uncategorized'}</td>
-                  <td className="px-6 py-4">₹{product.price?.toLocaleString('en-IN') || '0'}</td>
-                  <td className="px-6 py-4 flex space-x-4 items-center">
-                    <Link href={`/product/${product.slug}`} target="_blank" className="text-gray-400 hover:text-white transition-colors cursor-pointer" title="View Product">
-                      <Eye size={18} />
-                    </Link>
-                    <Link href={`/admin/products/${product.id}/edit`} className="text-blue-400 hover:text-blue-300 transition-colors cursor-pointer" title="Edit Product">
-                      <Edit size={18} />
-                    </Link>
-                    <DeleteProductButton id={product.id} />
-                  </td>
-                </tr>
-              ))}
-              {(!products || products.length === 0) && (
-                <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-white/50">
-                    No products found. Start by adding one.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Analytics Chart */}
+      <DashboardChart 
+        ordersData={ordersData || []} 
+        contactsData={contactsData || []} 
+        reviewsData={reviewsData || []} 
+      />
     </div>
   )
 }

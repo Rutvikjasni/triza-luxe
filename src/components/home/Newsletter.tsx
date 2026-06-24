@@ -21,7 +21,7 @@ export function Newsletter() {
 
   return (
     <section className="py-24 bg-transparent border-t border-gold/10 relative z-10">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-3xl -z-10" />
+      <div className="absolute inset-0 bg-[#0a0a0a] -z-10" />
       <div className="max-w-4xl mx-auto px-6 md:px-12 text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

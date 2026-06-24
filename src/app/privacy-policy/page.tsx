@@ -1,4 +1,4 @@
-import React from 'react'
+m runimport React from 'react'
 import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import ReactMarkdown from 'react-markdown'

@@ -31,7 +31,7 @@ export function Footer() {
 
   return (
     <footer className="bg-transparent text-white border-t border-gold/10 pt-20 pb-10 px-6 md:px-12 relative z-10">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl -z-10" />
+      <div className="absolute inset-0 bg-[#0a0a0a] -z-10" />
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           {/* Brand Column */}

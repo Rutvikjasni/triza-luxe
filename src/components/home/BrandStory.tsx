@@ -7,7 +7,7 @@ import Image from 'next/image'
 export function BrandStory() {
   return (
     <section className="py-24 bg-transparent relative overflow-hidden z-10">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-2xl -z-10" />
+      <div className="absolute inset-0 bg-[#0a0a0a] -z-10" />
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gold/10 blur-[100px] rounded-full translate-x-1/2 pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">

@@ -16,13 +16,13 @@ export function Hero() {
           src="/hero-mangalsutra.png"
           alt="Luxury Jewelry Masterpiece"
           fill
-          className="object-cover opacity-50 mix-blend-luminosity"
+          className="object-cover opacity-40"
           priority
         />
         {/* Gradient Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-        <div className="absolute inset-0 backdrop-blur-[2px]" />
+
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full pt-20">

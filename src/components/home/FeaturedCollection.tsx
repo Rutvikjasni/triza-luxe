@@ -9,7 +9,7 @@ export function FeaturedCollection({ products }: { products: Product[] }) {
 
   return (
     <section className="py-24 bg-transparent relative z-10">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-3xl -z-10 border-y border-gold/10" />
+      <div className="absolute inset-0 bg-[#0a0a0a] -z-10 border-y border-gold/10" />
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="flex flex-col items-center mb-16 text-center">
           <motion.h2 
